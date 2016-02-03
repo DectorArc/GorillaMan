@@ -1,6 +1,6 @@
 {
   "name": "three.js",
-  "version": "0.72.0",
+  "version": "0.73.0",
   "homepage": "http://threejs.org/",
   "authors": [
     "http://mrdoob.com"
@@ -20,13 +20,13 @@
     "test",
     "tests"
   ],
-  "_release": "0.72.0",
+  "_release": "0.73.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.72.0",
-    "commit": "b3b4b7b584178ab42cc389ec9d4a9f7689d7c230"
+    "tag": "0.73.0",
+    "commit": "6179f5adcf77a8b3e2910b80db2d9f6076a4ce47"
   },
   "_source": "git://github.com/jiyinyiyong/three.js.git",
-  "_target": "~0.72.0",
+  "_target": "*",
   "_originalSource": "three.js"
 }
