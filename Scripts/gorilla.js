@@ -22,6 +22,7 @@ var PerspectiveCamera = THREE.PerspectiveCamera;
 var CubeGeometry = THREE.CubeGeometry;
 var LambertMaterial = THREE.MeshLambertMaterial;
 var Mesh = THREE.Mesh;
+var ObjectD = THREE.Object3D;
 var SpotLight = THREE.SpotLight;
 var CubeColor = THREE.Color;
 var Vector3 = THREE.Vector3;
@@ -52,7 +53,9 @@ var neck;
 var head;
 var rightLeg;
 var leftLeg;
+var rad;
 function init() {
+    rad = 0;
     console.log("Testing Everything");
     scene = new Scene();
     console.log("Scene Created");
@@ -172,6 +175,20 @@ function setupCamera() {
 }
 function gameLoop() {
     requestAnimationFrame(gameLoop);
+    var rightArmPX = rightArm.position.x;
+    var rightArmPZ = rightArm.position.z;
+    var leftArmPX = leftArm.position.x;
+    var leftArmPZ = leftArm.position.z;
+    torso.material.opacity = control.opacity;
+    torso.rotation.y += control.rotationSpeed;
+    rightArm.material.opacity = control.opacity;
+    rightArm.position.x = rightArmPX * Math.cos(control.rotationSpeed) + rightArmPZ * Math.sin(control.rotationSpeed);
+    rightArm.position.z = rightArmPZ * Math.cos(control.rotationSpeed) - rightArmPX * Math.sin(control.rotationSpeed);
+    rightArm.rotation.x = control.rotationSpeed;
+    rightArm.rotation.z = control.rotationSpeed;
+    leftArm.material.opacity = control.opacity;
+    leftArm.position.x = leftArmPX * Math.cos(control.rotationSpeed) + leftArmPZ * Math.sin(control.rotationSpeed);
+    leftArm.position.z = leftArmPZ * Math.cos(control.rotationSpeed) - leftArmPX * Math.sin(control.rotationSpeed);
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=gorilla.js.map
