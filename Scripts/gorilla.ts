@@ -72,6 +72,8 @@ function init():void{
     scene.add(hips);
     scene.add(rightSphereJoint);
     scene.add(leftSphereJoint);
+    scene.add(rightHand);
+    scene.add(leftHand);
     
     var axisHelper = new THREE.AxisHelper(100);
     scene.add( axisHelper );
@@ -126,7 +128,6 @@ function bodySetup():void{
     hips.position.z = 0;
     
     //Adding Right Shoulder Joint
-    
     sphereJoints = new Sphere(0.3,32,32);
     sphereMaterial = new LambertMaterial({color:0x003300, opacity:0});
     
@@ -136,8 +137,7 @@ function bodySetup():void{
     rightSphereJoint.position.z = -1.75;
     
     
-    //Adding Left SHoulder Joint
-    
+    //Adding Left Shoulder Joint
     sphereJoints = new Sphere(0.3,32,32);
     sphereMaterial = new LambertMaterial({color:0x003300, opacity:0});
     
@@ -145,6 +145,25 @@ function bodySetup():void{
     leftSphereJoint.position.x = 0;
     leftSphereJoint.position.y = 4;
     leftSphereJoint.position.z = 1.75;
+    
+    
+    //Adding Right Hand
+    cubeGeometry = new CubeGeometry(0.2,3,0.2);
+    cubeMaterial = new LambertMaterial({color:0x003300, opacity:0});
+    
+    rightHand  = new Mesh(cubeGeometry,cubeMaterial);
+    rightHand.position.x = -0.04;
+    rightHand.position.y = 2.4;
+    rightHand.position.z = 1.67;
+    
+    //Adding Left Hand
+    cubeGeometry = new CubeGeometry(0.2,3,0.2);
+    cubeMaterial = new LambertMaterial({color:0x003300, opacity:0});
+    
+    leftHand = new Mesh(cubeGeometry,cubeMaterial);
+    leftHand.position.x = 0;
+    leftHand.position.y = 2.4;
+    leftHand.position.z = -1.67;
 }
 
 

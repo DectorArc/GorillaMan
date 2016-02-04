@@ -28,9 +28,9 @@ var rightSphereJoint;
 var leftSphereJoint;
 var rightHand;
 var leftHand;
+var hips;
 var neck;
 var head;
-var hips;
 var rightLeg;
 var leftLeg;
 function init() {
@@ -54,6 +54,8 @@ function init() {
     scene.add(hips);
     scene.add(rightSphereJoint);
     scene.add(leftSphereJoint);
+    scene.add(rightHand);
+    scene.add(leftHand);
     var axisHelper = new THREE.AxisHelper(100);
     scene.add(axisHelper);
     document.body.appendChild(renderer.domElement);
@@ -97,13 +99,27 @@ function bodySetup() {
     rightSphereJoint.position.x = 0;
     rightSphereJoint.position.y = 4;
     rightSphereJoint.position.z = -1.75;
-    //Adding Left SHoulder Joint
+    //Adding Left Shoulder Joint
     sphereJoints = new Sphere(0.3, 32, 32);
     sphereMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
     leftSphereJoint = new Mesh(sphereJoints, sphereMaterial);
     leftSphereJoint.position.x = 0;
     leftSphereJoint.position.y = 4;
     leftSphereJoint.position.z = 1.75;
+    //Adding Right Hand
+    cubeGeometry = new CubeGeometry(0.2, 3, 0.2);
+    cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
+    rightHand = new Mesh(cubeGeometry, cubeMaterial);
+    rightHand.position.x = -0.04;
+    rightHand.position.y = 2.4;
+    rightHand.position.z = 1.67;
+    //Adding Left Hand
+    cubeGeometry = new CubeGeometry(0.2, 3, 0.2);
+    cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
+    leftHand = new Mesh(cubeGeometry, cubeMaterial);
+    leftHand.position.x = 0;
+    leftHand.position.y = 2.4;
+    leftHand.position.z = -1.67;
 }
 // Setup default renderer
 // Renders the Scene by taking the screen width
