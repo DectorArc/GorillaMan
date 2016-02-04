@@ -1,5 +1,21 @@
 /// <reference path="typings/tsd.d.ts" />
-//Step 1 Create All Aliasies for scene
+/// <reference path="typings/threejs/three.d.ts" />
+/// <reference path="typings/dat-gui/dat-gui.d.ts" />
+var controlObject;
+(function (controlObject) {
+    var Control = (function () {
+        function Control(rotationSpeed, opacity, color) {
+            this.rotationSpeed = rotationSpeed;
+            this.opacity = opacity;
+            this.color = color;
+        }
+        return Control;
+    })();
+    controlObject.Control = Control;
+})(controlObject || (controlObject = {}));
+//Step 1 Create All Aliasies for scene 
+//these are going to be everything you need to 
+//run your graphics objects
 var Scene = THREE.Scene;
 var Renderer = THREE.WebGLRenderer;
 var PerspectiveCamera = THREE.PerspectiveCamera;
@@ -10,6 +26,7 @@ var SpotLight = THREE.SpotLight;
 var CubeColor = THREE.Color;
 var Vector3 = THREE.Vector3;
 var Sphere = THREE.SphereGeometry;
+var GUI = dat.GUI;
 //Step 2 Declare Functional Variables
 var scene;
 var renderer;
@@ -20,6 +37,8 @@ var sphereJoints;
 var sphereMaterial;
 var spotLight;
 var color;
+var gui;
+var control;
 //Step 2b delcare all the body parts
 var torso;
 var rightArm;
@@ -37,9 +56,15 @@ function init() {
     console.log("Testing Everything");
     scene = new Scene();
     console.log("Scene Created");
+    var axisHelper = new THREE.AxisHelper(100);
+    scene.add(axisHelper);
     setupRenderer();
     setupCamera();
     bodySetup();
+    //guiSetup();
+    gui = new GUI();
+    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex());
+    addControl(control);
     spotLight = new SpotLight(0xffffff);
     spotLight.position.set(20, 20, 20);
     spotLight.distance = 200;
@@ -56,10 +81,15 @@ function init() {
     scene.add(leftSphereJoint);
     scene.add(rightHand);
     scene.add(leftHand);
-    var axisHelper = new THREE.AxisHelper(100);
-    scene.add(axisHelper);
     document.body.appendChild(renderer.domElement);
     gameLoop();
+}
+function guiSetup() {
+}
+function addControl(controlObject) {
+    gui.add(controlObject, 'rotationSpeed', -0.2, 0.2);
+    gui.add(controlObject, 'opacity', 0.1, 1);
+    gui.addColor(controlObject, 'color');
 }
 function bodySetup() {
     //From blender Switch all the y and z values to make replica (Position)

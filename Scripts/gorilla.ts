@@ -1,7 +1,26 @@
 
 /// <reference path="typings/tsd.d.ts" />
+/// <reference path="typings/threejs/three.d.ts" />
+/// <reference path="typings/dat-gui/dat-gui.d.ts" />
 
-//Step 1 Create All Aliasies for scene
+module controlObject{
+    export class Control{
+        rotationSpeed: number;
+        opacity:number;
+        color:number;
+        constructor(rotationSpeed:number,opacity:number,color:number){
+            this.rotationSpeed = rotationSpeed;
+            this.opacity = opacity;
+            this.color = color;
+        }
+    }
+}
+
+
+
+//Step 1 Create All Aliasies for scene 
+//these are going to be everything you need to 
+//run your graphics objects
 import Scene = THREE.Scene;
 import Renderer =THREE.WebGLRenderer;
 import PerspectiveCamera = THREE.PerspectiveCamera;
@@ -12,6 +31,7 @@ import SpotLight = THREE.SpotLight;
 import CubeColor = THREE.Color;
 import Vector3 = THREE.Vector3;
 import Sphere = THREE.SphereGeometry;
+import GUI = dat.GUI;
 
 //Step 2 Declare Functional Variables
 var scene: Scene;
@@ -23,27 +43,24 @@ var sphereJoints: Sphere;
 var sphereMaterial : LambertMaterial;
 var spotLight: SpotLight;
 var color: CubeColor;
+var gui: GUI;
+var control: controlObject.Control; 
 
 
 //Step 2b delcare all the body parts
 var torso: Mesh;
-
 var rightArm: Mesh;
 var leftArm: Mesh;
-
 var rightSphereJoint: Mesh;
 var leftSphereJoint: Mesh;
-
 var rightHand: Mesh;
 var leftHand: Mesh;
-
 var hips: Mesh;
-
 var neck: Mesh;
 var head: Mesh;
-
 var rightLeg: Mesh;
 var leftLeg: Mesh;
+
 
 
 function init():void{
@@ -52,9 +69,17 @@ function init():void{
     scene = new Scene();
     console.log("Scene Created");
     
+    var axisHelper = new THREE.AxisHelper(100);
+    scene.add( axisHelper );
+    
     setupRenderer();
     setupCamera();
     bodySetup();
+    //guiSetup();
+    
+    gui = new GUI();
+    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex());
+    addControl(control);
     
     spotLight = new SpotLight(0xffffff);
 	spotLight.position.set (20, 20, 20);
@@ -75,12 +100,22 @@ function init():void{
     scene.add(rightHand);
     scene.add(leftHand);
     
-    var axisHelper = new THREE.AxisHelper(100);
-    scene.add( axisHelper );
+   
     
     
     document.body.appendChild(renderer.domElement);
     gameLoop();
+}
+
+function guiSetup():void{
+  
+}
+
+function addControl(controlObject:controlObject.Control):void{
+    gui.add(controlObject, 'rotationSpeed',-0.2,0.2);
+    gui.add(controlObject,'opacity',0.1,1);
+    gui.addColor(controlObject, 'color');
+    
 }
 
 function bodySetup():void{
