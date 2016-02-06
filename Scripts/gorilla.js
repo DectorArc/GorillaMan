@@ -27,12 +27,12 @@ var basicGameObject;
 var controlObject;
 (function (controlObject) {
     var Control = (function () {
-        function Control(rotationSpeed, opacity, color) {
+        function Control(rotationSpeed, opacity, color, planeWidth, planeHeight) {
             this.rotationSpeed = rotationSpeed;
             this.opacity = opacity;
             this.color = color;
-            this.planeWidth = 100;
-            this.planeHeight = 5;
+            this.planeWidth = planeWidth;
+            this.planeHeight = planeHeight;
         }
         Control.prototype.removeCube = function () {
             var allChildren = scene.children;
@@ -66,7 +66,7 @@ var PerspectiveCamera = THREE.PerspectiveCamera;
 var CubeGeometry = THREE.CubeGeometry;
 var LambertMaterial = THREE.MeshLambertMaterial;
 var Mesh = THREE.Mesh;
-var ObjectD = THREE.Object3D;
+var Object3D = THREE.Object3D;
 var SpotLight = THREE.SpotLight;
 var CubeColor = THREE.Color;
 var Vector3 = THREE.Vector3;
@@ -84,6 +84,7 @@ var spotLight;
 var color;
 var gui;
 var control;
+var pivotPoint;
 //Step 2b delcare all the body parts
 var torso;
 var rightArm;
@@ -98,6 +99,7 @@ var head;
 var rightLeg;
 var leftLeg;
 var rad;
+var plane;
 function init() {
     rad = 0;
     console.log("Testing Everything");
@@ -105,12 +107,14 @@ function init() {
     console.log("Scene Created");
     var axisHelper = new THREE.AxisHelper(100);
     scene.add(axisHelper);
+    cubeGeometry = new CubeGeometry(10, 3, 1);
+    cubeMaterial = new LambertMaterial({ color: 0x000000, opacity: 0 });
     setupRenderer();
     setupCamera();
     bodySetup();
     //guiSetup();
     gui = new GUI();
-    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex());
+    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex(), 100, 100);
     addControl(control);
     spotLight = new SpotLight(0xffffff);
     spotLight.position.set(20, 20, 20);
@@ -145,9 +149,7 @@ function bodySetup() {
     cubeGeometry = new CubeGeometry(1, 3, 1);
     cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
     torso = new Mesh(cubeGeometry, cubeMaterial);
-    torso.position.x = 0;
-    torso.position.y = 3;
-    torso.position.z = 0;
+    torso.position.set(0, 3, 0);
     //Adding Right Arm
     cubeGeometry = new CubeGeometry(0.2, 0.2, 1);
     cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
@@ -219,25 +221,29 @@ function setupCamera() {
 }
 function gameLoop() {
     requestAnimationFrame(gameLoop);
-    /*var rightArmPX = rightArm.position.x;
+    var rightArmPX = rightArm.position.x;
     var rightArmPZ = rightArm.position.z;
-    
     var leftArmPX = leftArm.position.x;
     var leftArmPZ = leftArm.position.z;
-    
     torso.material.opacity = control.opacity;
     torso.rotation.y += control.rotationSpeed;
-    
-    rightArm.material.opacity = control.opacity;
-    rightArm.position.set(0,4,-1);
-    rightArm.position.x = (-0.5 * Math.PI);
-    rightArm.position.z = (0.5 * Math.PI);
-
+    hips.rotation.y += control.rotationSpeed;
+    rightArm.position.x = rightArmPX * Math.cos(control.rotationSpeed) - leftArmPZ * Math.sin(control.rotationSpeed);
+    rightArm.position.z = rightArmPZ * Math.cos(control.rotationSpeed) + leftArmPX * Math.sin(control.rotationSpeed);
     leftArm.material.opacity = control.opacity;
+    leftArm.position.set(0, 4, 1);
     leftArm.position.x = leftArmPX * Math.cos(control.rotationSpeed) + leftArmPZ * Math.sin(control.rotationSpeed);
     leftArm.position.z = leftArmPZ * Math.cos(control.rotationSpeed) - leftArmPX * Math.sin(control.rotationSpeed);
-    
-    */
+    rightArm.rotation.y += control.rotationSpeed;
+    leftArm.rotation.y += control.rotationSpeed;
+    var rightShoulderJointPX = rightSphereJoint.position.x;
+    var rightShoulderJointPZ = rightSphereJoint.position.z;
+    var leftShoulderJointPX = leftSphereJoint.position.x;
+    var leftShoulderJointPZ = leftSphereJoint.position.z;
+    rightSphereJoint.position.x = rightShoulderJointPX * Math.cos(control.rotationSpeed) - leftShoulderJointPZ * Math.sin(control.rotationSpeed);
+    rightSphereJoint.position.z = rightShoulderJointPZ * Math.cos(control.rotationSpeed) + leftShoulderJointPX * Math.sin(control.rotationSpeed);
+    leftSphereJoint.position.x = leftShoulderJointPX * Math.cos(control.rotationSpeed) + leftShoulderJointPZ * Math.sin(control.rotationSpeed);
+    leftSphereJoint.position.z = leftShoulderJointPZ * Math.cos(control.rotationSpeed) - leftShoulderJointPX * Math.sin(control.rotationSpeed);
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=gorilla.js.map
