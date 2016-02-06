@@ -3,18 +3,93 @@
 /// <reference path="typings/threejs/three.d.ts" />
 /// <reference path="typings/dat-gui/dat-gui.d.ts" />
 
-module controlObject{
-    export class Control{
-        rotationSpeed: number;
-        opacity:number;
-        color:number;
-        constructor(rotationSpeed:number,opacity:number,color:number){
-            this.rotationSpeed = rotationSpeed;
-            this.opacity = opacity;
-            this.color = color;
+module basicGameObject{
+    export class gameObject extends THREE.Mesh{
+        
+        geometry: THREE.Geometry;
+        material: THREE.Material;
+        
+        constructor(geometry: THREE.Geometry, material: THREE.Material, x:number,y:number,z:number){
+            super(geometry,material);
+            this.geometry = geometry;
+            this.material = material;
+            this.position.x = x;
+            this.position.y = y;
+            this.position.z = z;
+            this.receiveShadow = true;
+            this.castShadow = true;
+            
         }
     }
 }
+
+
+
+module controlObject{
+    export class Control{
+        
+        
+        rotationSpeed: number;
+        opacity:number;
+        color:number;
+        numberOfObjects: number;
+        planeWidth: number;
+        planeHeight: number;
+        
+        constructor(rotationSpeed:number,opacity:number,color:number){
+            
+            this.rotationSpeed = rotationSpeed;
+            this.opacity = opacity;
+            this.color = color;
+            
+            
+            this.planeWidth = 100;
+            this.planeHeight = 5;
+        }
+        
+     
+        
+        public removeCube(): void{
+            var allChildren: THREE.Object3D[] = scene.children;
+            var lastObject = allChildren[allChildren.length - 1];
+            
+            if(lastObject instanceof THREE.Mesh){
+                scene.remove(lastObject);
+                this.numberOfObjects = scene.children.length;
+            }
+        }
+        
+        public addCube(): void{
+            
+            var cubeSize: number = Math.ceil((Math.random() * 3));
+            var cubeGeometry: CubeGeometry = new THREE.CubeGeometry(cubeSize,cubeSize,cubeSize);
+            var cubeMaterial: LambertMaterial = new THREE.MeshLambertMaterial({color:Math.random()* 0xffffff });
+            
+            
+            var cube = new basicGameObject.gameObject(
+                cubeGeometry,
+                cubeMaterial,
+                -30 + Math.round((Math.random() * this.planeWidth)),
+                Math.round((Math.random() * 5)),
+                -20 + Math.round(((Math.random() *this.planeHeight)))
+            );
+            scene.add(cube);
+            this.numberOfObjects = scene.children.length;
+            
+        }
+        
+        public outputObjects():void{
+            console.log(scene.children);
+        }
+        
+        
+    }
+    
+    
+}
+
+
+
 
 //Step 1 Create All Aliasies for scene 
 //these are going to be everything you need to 
@@ -225,7 +300,7 @@ function gameLoop():void{
     
     requestAnimationFrame(gameLoop);
     
-    var rightArmPX = rightArm.position.x;
+    /*var rightArmPX = rightArm.position.x;
     var rightArmPZ = rightArm.position.z;
     
     var leftArmPX = leftArm.position.x;
@@ -235,13 +310,15 @@ function gameLoop():void{
     torso.rotation.y += control.rotationSpeed; 
     
     rightArm.material.opacity = control.opacity;
-    rightArm.position.x = rightArmPX * Math.cos(control.rotationSpeed) + rightArmPZ * Math.sin(control.rotationSpeed);
-    rightArm.position.z = rightArmPZ * Math.cos(control.rotationSpeed) - rightArmPX * Math.sin(control.rotationSpeed);
-    rightArm.rotation.x = control.rotationSpeed;
-    rightArm.rotation.z = control.rotationSpeed;
-    
+    rightArm.position.set(0,4,-1);
+    rightArm.position.x = (-0.5 * Math.PI);
+    rightArm.position.z = (0.5 * Math.PI);
+
     leftArm.material.opacity = control.opacity;
     leftArm.position.x = leftArmPX * Math.cos(control.rotationSpeed) + leftArmPZ * Math.sin(control.rotationSpeed);
     leftArm.position.z = leftArmPZ * Math.cos(control.rotationSpeed) - leftArmPX * Math.sin(control.rotationSpeed);
+    
+    */
+    
     renderer.render(scene,camera);
 }

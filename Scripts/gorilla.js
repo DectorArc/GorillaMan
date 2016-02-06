@@ -1,6 +1,29 @@
 /// <reference path="typings/tsd.d.ts" />
 /// <reference path="typings/threejs/three.d.ts" />
 /// <reference path="typings/dat-gui/dat-gui.d.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var basicGameObject;
+(function (basicGameObject) {
+    var gameObject = (function (_super) {
+        __extends(gameObject, _super);
+        function gameObject(geometry, material, x, y, z) {
+            _super.call(this, geometry, material);
+            this.geometry = geometry;
+            this.material = material;
+            this.position.x = x;
+            this.position.y = y;
+            this.position.z = z;
+            this.receiveShadow = true;
+            this.castShadow = true;
+        }
+        return gameObject;
+    })(THREE.Mesh);
+    basicGameObject.gameObject = gameObject;
+})(basicGameObject || (basicGameObject = {}));
 var controlObject;
 (function (controlObject) {
     var Control = (function () {
@@ -8,7 +31,28 @@ var controlObject;
             this.rotationSpeed = rotationSpeed;
             this.opacity = opacity;
             this.color = color;
+            this.planeWidth = 100;
+            this.planeHeight = 5;
         }
+        Control.prototype.removeCube = function () {
+            var allChildren = scene.children;
+            var lastObject = allChildren[allChildren.length - 1];
+            if (lastObject instanceof THREE.Mesh) {
+                scene.remove(lastObject);
+                this.numberOfObjects = scene.children.length;
+            }
+        };
+        Control.prototype.addCube = function () {
+            var cubeSize = Math.ceil((Math.random() * 3));
+            var cubeGeometry = new THREE.CubeGeometry(cubeSize, cubeSize, cubeSize);
+            var cubeMaterial = new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff });
+            var cube = new basicGameObject.gameObject(cubeGeometry, cubeMaterial, -30 + Math.round((Math.random() * this.planeWidth)), Math.round((Math.random() * 5)), -20 + Math.round(((Math.random() * this.planeHeight))));
+            scene.add(cube);
+            this.numberOfObjects = scene.children.length;
+        };
+        Control.prototype.outputObjects = function () {
+            console.log(scene.children);
+        };
         return Control;
     })();
     controlObject.Control = Control;
@@ -175,20 +219,25 @@ function setupCamera() {
 }
 function gameLoop() {
     requestAnimationFrame(gameLoop);
-    var rightArmPX = rightArm.position.x;
+    /*var rightArmPX = rightArm.position.x;
     var rightArmPZ = rightArm.position.z;
+    
     var leftArmPX = leftArm.position.x;
     var leftArmPZ = leftArm.position.z;
+    
     torso.material.opacity = control.opacity;
     torso.rotation.y += control.rotationSpeed;
+    
     rightArm.material.opacity = control.opacity;
-    rightArm.position.x = rightArmPX * Math.cos(control.rotationSpeed) + rightArmPZ * Math.sin(control.rotationSpeed);
-    rightArm.position.z = rightArmPZ * Math.cos(control.rotationSpeed) - rightArmPX * Math.sin(control.rotationSpeed);
-    rightArm.rotation.x = control.rotationSpeed;
-    rightArm.rotation.z = control.rotationSpeed;
+    rightArm.position.set(0,4,-1);
+    rightArm.position.x = (-0.5 * Math.PI);
+    rightArm.position.z = (0.5 * Math.PI);
+
     leftArm.material.opacity = control.opacity;
     leftArm.position.x = leftArmPX * Math.cos(control.rotationSpeed) + leftArmPZ * Math.sin(control.rotationSpeed);
     leftArm.position.z = leftArmPZ * Math.cos(control.rotationSpeed) - leftArmPX * Math.sin(control.rotationSpeed);
+    
+    */
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=gorilla.js.map
