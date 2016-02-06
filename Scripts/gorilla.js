@@ -1,58 +1,14 @@
 /// <reference path="typings/tsd.d.ts" />
 /// <reference path="typings/threejs/three.d.ts" />
 /// <reference path="typings/dat-gui/dat-gui.d.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var basicGameObject;
-(function (basicGameObject) {
-    var gameObject = (function (_super) {
-        __extends(gameObject, _super);
-        function gameObject(geometry, material, x, y, z) {
-            _super.call(this, geometry, material);
-            this.geometry = geometry;
-            this.material = material;
-            this.position.x = x;
-            this.position.y = y;
-            this.position.z = z;
-            this.receiveShadow = true;
-            this.castShadow = true;
-        }
-        return gameObject;
-    })(THREE.Mesh);
-    basicGameObject.gameObject = gameObject;
-})(basicGameObject || (basicGameObject = {}));
 var controlObject;
 (function (controlObject) {
     var Control = (function () {
-        function Control(rotationSpeed, opacity, color, planeWidth, planeHeight) {
+        function Control(rotationSpeed, opacity, color) {
             this.rotationSpeed = rotationSpeed;
             this.opacity = opacity;
             this.color = color;
-            this.planeWidth = planeWidth;
-            this.planeHeight = planeHeight;
         }
-        Control.prototype.removeCube = function () {
-            var allChildren = scene.children;
-            var lastObject = allChildren[allChildren.length - 1];
-            if (lastObject instanceof THREE.Mesh) {
-                scene.remove(lastObject);
-                this.numberOfObjects = scene.children.length;
-            }
-        };
-        Control.prototype.addCube = function () {
-            var cubeSize = Math.ceil((Math.random() * 3));
-            var cubeGeometry = new THREE.CubeGeometry(cubeSize, cubeSize, cubeSize);
-            var cubeMaterial = new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff });
-            var cube = new basicGameObject.gameObject(cubeGeometry, cubeMaterial, -30 + Math.round((Math.random() * this.planeWidth)), Math.round((Math.random() * 5)), -20 + Math.round(((Math.random() * this.planeHeight))));
-            scene.add(cube);
-            this.numberOfObjects = scene.children.length;
-        };
-        Control.prototype.outputObjects = function () {
-            console.log(scene.children);
-        };
         return Control;
     })();
     controlObject.Control = Control;
@@ -114,7 +70,7 @@ function init() {
     bodySetup();
     //guiSetup();
     gui = new GUI();
-    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex(), 100, 100);
+    control = new controlObject.Control(0.005, cubeMaterial.opacity, cubeMaterial.color.getHex());
     addControl(control);
     spotLight = new SpotLight(0xffffff);
     spotLight.position.set(20, 20, 20);
@@ -132,6 +88,8 @@ function init() {
     scene.add(leftSphereJoint);
     scene.add(rightHand);
     scene.add(leftHand);
+    scene.add(rightLeg);
+    scene.add(leftLeg);
     document.body.appendChild(renderer.domElement);
     gameLoop();
 }
@@ -199,6 +157,20 @@ function bodySetup() {
     leftHand.position.x = 0;
     leftHand.position.y = 2.4;
     leftHand.position.z = -1.67;
+    //Adding Right Leg
+    cubeGeometry = new CubeGeometry(0.2, 2, 0.2);
+    cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
+    rightLeg = new Mesh(cubeGeometry, cubeMaterial);
+    rightLeg.position.x = 0;
+    rightLeg.position.y = 0.5;
+    rightLeg.position.z = -1;
+    //Adding Left Leg
+    cubeGeometry = new CubeGeometry(0.2, 2, 0.2);
+    cubeMaterial = new LambertMaterial({ color: 0x003300, opacity: 0 });
+    leftLeg = new Mesh(cubeGeometry, cubeMaterial);
+    leftLeg.position.x = 0;
+    leftLeg.position.y = 0.5;
+    leftLeg.position.z = 1;
 }
 // Setup default renderer
 // Renders the Scene by taking the screen width
@@ -221,19 +193,21 @@ function setupCamera() {
 }
 function gameLoop() {
     requestAnimationFrame(gameLoop);
+    torso.material.opacity = control.opacity;
+    torso.rotation.y += control.rotationSpeed;
+    hips.rotation.y += control.rotationSpeed;
+    //---Setting up the X and X values for the right arm
     var rightArmPX = rightArm.position.x;
     var rightArmPZ = rightArm.position.z;
     var leftArmPX = leftArm.position.x;
     var leftArmPZ = leftArm.position.z;
-    torso.material.opacity = control.opacity;
-    torso.rotation.y += control.rotationSpeed;
-    hips.rotation.y += control.rotationSpeed;
+    //---Setting up the X and X values for the right arm
+    //--Spinning right and left arm position angle rotates in a circle because of cos and sin working on opposite axis
     rightArm.position.x = rightArmPX * Math.cos(control.rotationSpeed) - leftArmPZ * Math.sin(control.rotationSpeed);
     rightArm.position.z = rightArmPZ * Math.cos(control.rotationSpeed) + leftArmPX * Math.sin(control.rotationSpeed);
-    leftArm.material.opacity = control.opacity;
-    leftArm.position.set(0, 4, 1);
     leftArm.position.x = leftArmPX * Math.cos(control.rotationSpeed) + leftArmPZ * Math.sin(control.rotationSpeed);
     leftArm.position.z = leftArmPZ * Math.cos(control.rotationSpeed) - leftArmPX * Math.sin(control.rotationSpeed);
+    //--Spinning right and left arm position angle rotates in a circle because of cos and sin working on opposite axis
     rightArm.rotation.y += control.rotationSpeed;
     leftArm.rotation.y += control.rotationSpeed;
     var rightShoulderJointPX = rightSphereJoint.position.x;
@@ -244,6 +218,31 @@ function gameLoop() {
     rightSphereJoint.position.z = rightShoulderJointPZ * Math.cos(control.rotationSpeed) + leftShoulderJointPX * Math.sin(control.rotationSpeed);
     leftSphereJoint.position.x = leftShoulderJointPX * Math.cos(control.rotationSpeed) + leftShoulderJointPZ * Math.sin(control.rotationSpeed);
     leftSphereJoint.position.z = leftShoulderJointPZ * Math.cos(control.rotationSpeed) - leftShoulderJointPX * Math.sin(control.rotationSpeed);
+    var rightHandPX = rightHand.position.x;
+    var rightHandPZ = rightHand.position.z;
+    var leftHandPX = leftHand.position.x;
+    var leftHandPZ = leftHand.position.z;
+    //--Spinning right and left Hand position angle rotates in a circle because of cos and sin working on opposite axis
+    rightHand.position.x = rightHandPX * Math.cos(control.rotationSpeed) - leftHandPZ * Math.sin(control.rotationSpeed);
+    rightHand.position.z = rightHandPZ * Math.cos(control.rotationSpeed) + leftHandPX * Math.sin(control.rotationSpeed);
+    leftHand.position.x = leftHandPX * Math.cos(control.rotationSpeed) + leftHandPZ * Math.sin(control.rotationSpeed);
+    leftHand.position.z = leftHandPZ * Math.cos(control.rotationSpeed) - leftHandPX * Math.sin(control.rotationSpeed);
+    //--Spinning right and left Hand position angle rotates in a circle because of cos and sin working on opposite axis
+    rightHand.rotation.y += control.rotationSpeed;
+    leftHand.rotation.y += control.rotationSpeed;
+    var rightLegPX = rightLeg.position.x;
+    var rightLegPZ = rightLeg.position.z;
+    var leftLegPX = leftLeg.position.x;
+    var leftLegPZ = leftLeg.position.z;
+    rightLeg.position.x = rightLegPX * Math.cos(control.rotationSpeed) - leftLegPZ * Math.sin(control.rotationSpeed);
+    rightLeg.position.z = rightLegPZ * Math.cos(control.rotationSpeed) + leftLegPX * Math.sin(control.rotationSpeed);
+    leftLeg.position.x = leftLegPX * Math.cos(control.rotationSpeed) + leftLegPZ * Math.sin(control.rotationSpeed);
+    leftLeg.position.z = leftLegPZ * Math.cos(control.rotationSpeed) - leftLegPX * Math.sin(control.rotationSpeed);
+    rightLeg.rotation.y += control.rotationSpeed;
+    leftLeg.rotation.y += control.rotationSpeed;
+    torso.material = new LambertMaterial({ color: control.color, opacity: 0 });
+    rightHand.material = new LambertMaterial({ color: control.color - Math.random(), opacity: 0 });
+    leftHand.material = new LambertMaterial({ color: control.color - Math.random(), opacity: 0 });
     renderer.render(scene, camera);
 }
 //# sourceMappingURL=gorilla.js.map
