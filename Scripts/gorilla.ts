@@ -137,7 +137,7 @@ function bodySetup(): void {
     //From blender Switch all the y and z values to make replica (Position)
     //From blender middle value for cubeGeometry determines length
     
-  
+  // Second
     
     //Adding Torso
     cubeGeometry = new CubeGeometry(1, 3, 1);
